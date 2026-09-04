@@ -4366,3 +4366,26 @@ button{border:none;outline:none;cursor:pointer;font-family:var(--bd)}
     .sec-title h2 { font-size: 1.3rem !important; }
     .apm-heading { font-size: 1.5rem !important; }
 }
+
+/* =========================================================
+   FIX ABOUT SECTION MOBILE (Remove Gap & Fix Photo)
+========================================================= */
+@media (max-width: 768px) {
+    /* Remove the massive gap between Hero marquee and About section */
+    .about-premium {
+        padding: 40px 0 30px !important; /* Was 140px previously */
+    }
+    
+    /* Make Founder Photo Full and uncropped */
+    .apm-img-wrap img {
+        height: auto !important; /* Let it scale naturally */
+        max-height: 500px !important; /* Don't let it get crazy tall on tablets */
+        width: 100% !important;
+        object-fit: contain !important; /* Shows the full uncropped photo */
+        background: transparent !important;
+    }
+    .apm-img-wrap {
+        background: rgba(10,10,10,0.5) !important; /* Dark bg in case of empty space */
+        padding: 10px !important;
+    }
+}
