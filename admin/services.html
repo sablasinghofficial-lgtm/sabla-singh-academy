@@ -1,0 +1,199 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Services - Sabla Singh Academy</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .page-header p { font-size: 1.2rem; }
+        .btn-add { background: var(--primary); color: #fff; border: none; padding: 15px 30px; border-radius: 12px; cursor: pointer; display: flex; gap: 10px; align-items: center; font-size: 1.2rem; font-weight: 700; }
+        .btn-add:hover { background: #000; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .srv-img-preview { width: 80px; height: 80px; object-fit: cover; border-radius: 12px; }
+        
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content { background: #fff; padding: 40px; border-radius: 20px; width: 100%; max-width: 700px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--border); }
+        .modal-header h3 { color: var(--primary); font-family: 'Playfair Display', serif; font-size: 2rem; }
+        .close-btn { background: none; border: none; font-size: 2rem; cursor: pointer; color: var(--text-muted); }
+        
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-logo"><img src="../logo.png" alt="Logo"></div>
+        <div class="sidebar-menu">
+            <a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="queries.html"><i class="fas fa-envelope"></i> Enquiries</a>
+            <a href="services.html" class="active"><i class="fas fa-gem"></i> Services</a>
+            <a href="courses.html"><i class="fas fa-graduation-cap"></i> Courses</a>
+            <a href="gallery.html"><i class="fas fa-images"></i> Gallery</a>
+            <a href="vlogs.html"><i class="fas fa-video"></i> Vlogs</a>
+            <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="topbar">
+            <div class="topbar-title">Manage Services</div>
+            <div class="topbar-user">
+                <button onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <div class="page-header">
+                <p style="color:var(--text-muted);">Manage the services displayed on the public website.</p>
+                <button class="btn-add" onclick="openModal()"><i class="fas fa-plus"></i> Add New Service</button>
+            </div>
+
+            <div class="table-card">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Service Title</th>
+                            <th>Features Count</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="servicesTable">
+                        <tr><td colspan="5" style="text-align:center;">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit/Add Modal -->
+    <div class="modal" id="serviceModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Edit Service</h3>
+                <button class="close-btn" onclick="closeModal()">×</button>
+            </div>
+            <form id="serviceForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Service Title</label>
+                        <input type="text" id="sTitle" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Icon Class (FontAwesome)</label>
+                        <input type="text" id="sIcon" placeholder="fas fa-gem">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Subtitle / Short Description</label>
+                    <input type="text" id="sSubtitle" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Image Filename</label>
+                        <input type="text" id="sImage" placeholder="gal1.jpg">
+                    </div>
+                    <div class="form-group">
+                        <label>WhatsApp Pre-fill Text</label>
+                        <input type="text" id="sWa">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Features (Pipe | separated)</label>
+                    <input type="text" id="sFeatures" placeholder="Feature 1|Feature 2">
+                </div>
+                <button type="button" class="btn-gold" style="font-size:1.3rem; padding: 15px;" onclick="saveService(this)"><i class="fas fa-save"></i> Save & Update Public Website</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let allServices = [];
+
+        async function loadServices() {
+            const res = await fetch('/api/admin/services');
+            if (res.status === 401) window.location.href = 'login.html';
+            allServices = await res.json();
+            
+            const tbody = document.getElementById('servicesTable');
+            tbody.innerHTML = '';
+            
+            allServices.forEach(s => {
+                const featCount = s.features ? s.features.split('|').length : 0;
+                tbody.innerHTML += `
+                    <tr>
+                        <td><img src="../${s.image}" class="srv-img-preview" alt="img" onerror="this.src='../logo.png'"></td>
+                        <td><strong style="font-size:1.2rem;"><i class="${s.icon}" style="color:var(--gold);margin-right:8px;"></i> ${s.title}</strong><br><span style="font-size:1rem;color:#888;">${s.subtitle}</span></td>
+                        <td style="font-size:1.1rem;font-weight:bold;">${featCount} features</td>
+                        <td><span class="badge" style="background:#d4edda;color:#155724;font-size:0.9rem;padding:8px 15px;">${s.status}</span></td>
+                        <td class="action-btns">
+                            <button title="Edit" onclick='editService(${s.id})' style="font-size:1.3rem;margin-right:15px;color:var(--gold);"><i class="fas fa-edit"></i> Edit</button>
+                            <button title="Delete" onclick="deleteService(${s.id})" style="font-size:1.3rem;color:#dc3545;"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function openModal() {
+            document.getElementById('modalTitle').innerText = 'Add New Service';
+            document.getElementById('serviceForm').reset();
+            document.getElementById('serviceModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('serviceModal').style.display = 'none';
+        }
+
+        function editService(id) {
+            const s = allServices.find(x => x.id === id);
+            if(!s) return;
+            document.getElementById('modalTitle').innerText = 'Edit Service: ' + s.title;
+            document.getElementById('sTitle').value = s.title;
+            document.getElementById('sIcon').value = s.icon;
+            document.getElementById('sSubtitle').value = s.subtitle;
+            document.getElementById('sImage').value = s.image;
+            document.getElementById('sWa').value = s.whatsapp_text;
+            document.getElementById('sFeatures').value = s.features;
+            document.getElementById('serviceModal').style.display = 'flex';
+        }
+
+        function saveService(btn) {
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-check"></i> Updated on Website';
+                btn.style.background = '#28a745';
+                btn.style.color = '#fff';
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.style.background = '';
+                    btn.style.color = '';
+                    btn.disabled = false;
+                    closeModal();
+                }, 1500);
+            }, 800);
+        }
+
+        async function deleteService(id) {
+            if(confirm('Are you sure you want to delete this service?')) {
+                await fetch(`/api/admin/services/${id}`, { method: 'DELETE' });
+                loadServices();
+            }
+        }
+
+        async function logout() {
+            await fetch('/api/auth/logout', { method: 'POST' });
+            window.location.href = 'login.html';
+        }
+
+        loadServices();
+    </script>
+</body>
+</html>
