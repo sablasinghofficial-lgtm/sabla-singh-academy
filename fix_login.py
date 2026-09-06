@@ -1,35 +1,13 @@
-﻿<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Admin Login - Sabla Singh Academy</title>
-    <link rel="stylesheet" href="css/admin.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+﻿import os
+import re
 
+firebase_scripts = '''
     <script type="module" src="js/firebase-init.js"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
     <script src="js/cloudinary-init.js"></script>
+'''
 
-</head>
-<body class="login-page">
-    <div class="login-card">
-        <img src="../logo.png" alt="Sabla Singh Academy">
-        <h2>Admin Portal</h2>
-        <form id="loginForm">
-            <div class="form-group">
-                <label>Username</label>
-                <input type="text" id="username" required>
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="password" required>
-            </div>
-            <button type="submit" class="btn-gold">Sign In</button>
-            <div class="error-msg" id="errorMsg">Invalid username or password.</div>
-        </form>
-    </div>
-
-    <script type="module">
+login_script = '''<script type="module">
         import { auth, signInWithEmailAndPassword } from './js/firebase-init.js';
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -50,6 +28,15 @@
                 btn.disabled = false;
             }
         });
-    </script>
-</body>
-</html>
+    </script>'''
+
+# Modify admin/login.html
+with open('admin/login.html', 'r', encoding='utf-8') as f:
+    content = f.read()
+if 'firebase-init.js' not in content:
+    content = content.replace('</head>', firebase_scripts + '\n</head>')
+    content = re.sub(r'<script>.*?</script>', login_script, content, flags=re.DOTALL)
+with open('admin/login.html', 'w', encoding='utf-8') as f:
+    f.write(content)
+
+print("Updated login.html")
