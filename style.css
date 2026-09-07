@@ -4591,3 +4591,26 @@ button{border:none;outline:none;cursor:pointer;font-family:var(--bd)}
     font-size: 0.7rem !important;
     border-radius: 6px !important;
 }
+
+/* =========================================================
+   COURSE CARD IMAGES - FULL SHOW FIX (No Cropping)
+========================================================= */
+.crs-card-img {
+    height: 220px !important;
+    overflow: hidden !important;
+    position: relative !important;
+}
+.crs-card-img img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center top !important;
+    transition: transform 0.5s !important;
+}
+.crs-card-3d:hover .crs-card-img img {
+    transform: scale(1.04) !important;
+}
+
+@media (max-width: 768px) {
+    .crs-card-img { height: 180px !important; }
+}
