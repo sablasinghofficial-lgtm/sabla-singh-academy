@@ -4796,3 +4796,23 @@ button{border:none;outline:none;cursor:pointer;font-family:var(--bd)}
         background: linear-gradient(to bottom, rgba(17,17,17,0.8) 0%, rgba(17,17,17,0.95) 100%) !important;
     }
 }
+
+/* =========================================================
+   HERO TEXT & BACKGROUND OVERLAY - BRIGHTER FIX
+========================================================= */
+/* Make typewriter text Bright White with a nice glow */
+.hero-main, .typewriter-wrap {
+    color: #ffffff !important;
+    text-shadow: 0 4px 15px rgba(0,0,0,0.6) !important;
+}
+
+/* Lighter Overlay - Less Black, More Transparent */
+.hero-overlay {
+    background: linear-gradient(to right, rgba(17,17,17,0.7) 0%, rgba(17,17,17,0.5) 40%, rgba(17,17,17,0.1) 100%) !important;
+}
+
+@media (max-width: 768px) {
+    .hero-overlay {
+        background: linear-gradient(to bottom, rgba(17,17,17,0.5) 0%, rgba(17,17,17,0.85) 100%) !important;
+    }
+}
