@@ -4710,3 +4710,38 @@ button{border:none;outline:none;cursor:pointer;font-family:var(--bd)}
 @media (max-width: 768px) {
     .apm-img-wrap { height: 380px !important; }
 }
+
+/* =========================================================
+   NAVBAR BRAND - NEW LOGO + BLACK TEXT STYLE
+========================================================= */
+.nav-brand img {
+    height: 58px !important;
+    width: auto !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+}
+.brand-title {
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: 1.0rem !important;
+    color: #1a1a1a !important;
+    font-weight: 700 !important;
+    letter-spacing: 1px !important;
+    text-transform: uppercase !important;
+}
+.brand-sub {
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: 0.38rem !important;
+    font-weight: 600 !important;
+    color: var(--gold) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 4px !important;
+    margin-top: 1px !important;
+    opacity: 1 !important;
+}
+
+@media (max-width: 768px) {
+    .nav-brand img { height: 46px !important; }
+    .brand-title { font-size: 0.85rem !important; }
+    .brand-sub { font-size: 0.32rem !important; letter-spacing: 3px !important; }
+}
