@@ -4645,3 +4645,48 @@ button{border:none;outline:none;cursor:pointer;font-family:var(--bd)}
     .brand-title { font-size: 1.2rem !important; }
     .brand-sub { font-size: 0.42rem !important; letter-spacing: 4px !important; }
 }
+
+/* =========================================================
+   COURSE CARD - FIX IMAGE CUT + TAG BELOW IMAGE
+========================================================= */
+
+/* Make image taller so full face is visible */
+.crs-card-img {
+    height: 260px !important;
+    overflow: hidden !important;
+    position: relative !important;
+    border-radius: 16px 16px 0 0 !important;
+}
+.crs-card-img img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center 20% !important;
+    display: block !important;
+}
+
+/* Move tag badge to BOTTOM of image (not overlapping face) */
+.crs-tag {
+    position: absolute !important;
+    top: auto !important;
+    bottom: 12px !important;
+    left: 14px !important;
+    right: auto !important;
+    z-index: 5 !important;
+    font-size: 0.6rem !important;
+    padding: 4px 10px !important;
+    border-radius: 4px !important;
+}
+
+/* Reduce body padding slightly */
+.crs-body-premium {
+    padding: 18px 22px !important;
+}
+.crs-body-premium h4 {
+    font-size: 1.3rem !important;
+    margin-bottom: 4px !important;
+}
+
+@media (max-width: 768px) {
+    .crs-card-img { height: 200px !important; }
+}
