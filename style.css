@@ -4745,3 +4745,33 @@ button{border:none;outline:none;cursor:pointer;font-family:var(--bd)}
     .brand-title { font-size: 0.85rem !important; }
     .brand-sub { font-size: 0.32rem !important; letter-spacing: 3px !important; }
 }
+
+/* =========================================================
+   NAVBAR - TRANSPARENT LOGO + BLACK TEXT FINAL
+========================================================= */
+.nav-brand img {
+    height: 58px !important;
+    width: auto !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    mix-blend-mode: multiply !important;
+}
+.brand-title {
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: 1.0rem !important;
+    color: #111111 !important;
+    font-weight: 800 !important;
+    letter-spacing: 1.5px !important;
+    text-transform: uppercase !important;
+}
+.brand-sub {
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: 0.38rem !important;
+    font-weight: 700 !important;
+    color: #111111 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 4px !important;
+    margin-top: 1px !important;
+    opacity: 0.7 !important;
+}
