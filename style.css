@@ -4553,3 +4553,41 @@ button{border:none;outline:none;cursor:pointer;font-family:var(--bd)}
         padding: 9px 16px !important; 
     }
 }
+
+/* =========================================================
+   CONTACT PAGE - DESKTOP SIZE REDUCE (Final Fix)
+========================================================= */
+.contact { padding: 50px 0 !important; }
+.contact-grid { gap: 30px !important; }
+
+/* Get In Touch Left Side */
+.contact-info h2 { font-size: 1.7rem !important; margin-bottom: 8px !important; }
+.contact-info > p { font-size: 0.78rem !important; margin-bottom: 18px !important; line-height: 1.6 !important; }
+
+/* Contact items - address, phone, email */
+.c-item { gap: 10px !important; margin-bottom: 12px !important; }
+.c-icon { width: 36px !important; height: 36px !important; }
+.c-icon i { font-size: 0.85rem !important; }
+.c-detail h4 { font-size: 0.78rem !important; margin-bottom: 2px !important; }
+.c-detail p, .c-detail a { font-size: 0.73rem !important; line-height: 1.45 !important; }
+
+/* Social icons */
+.c-socials a { width: 32px !important; height: 32px !important; font-size: 0.78rem !important; }
+.c-socials { gap: 8px !important; margin-top: 14px !important; }
+
+/* Quick Enquiry Form Right Side */
+.contact-form { padding: 22px !important; border-radius: 10px !important; }
+.contact-form h3 { font-size: 1.1rem !important; margin-bottom: 14px !important; padding-bottom: 10px !important; }
+.form-group { margin-bottom: 10px !important; }
+.form-group label { font-size: 0.62rem !important; margin-bottom: 4px !important; }
+.form-group input, .form-group select, .form-group textarea {
+    padding: 9px 12px !important;
+    font-size: 0.78rem !important;
+    border-radius: 6px !important;
+}
+.form-group textarea { min-height: 70px !important; }
+.form-submit {
+    padding: 10px 14px !important;
+    font-size: 0.7rem !important;
+    border-radius: 6px !important;
+}
