@@ -4614,3 +4614,34 @@ button{border:none;outline:none;cursor:pointer;font-family:var(--bd)}
 @media (max-width: 768px) {
     .crs-card-img { height: 180px !important; }
 }
+
+/* =========================================================
+   NAVBAR BRAND - PROFESSIONAL LOOK FIX
+========================================================= */
+.nav-brand img {
+    height: 62px !important;
+    width: auto !important;
+}
+.brand-title {
+    font-family: var(--sc) !important;
+    font-size: 1.35rem !important;
+    color: var(--gold) !important;
+    font-weight: normal !important;
+    letter-spacing: 0.5px !important;
+}
+.brand-sub {
+    font-family: var(--bd) !important;
+    font-size: 0.48rem !important;
+    font-weight: 900 !important;
+    color: var(--gold) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 5px !important;
+    margin-top: 2px !important;
+    opacity: 0.85 !important;
+}
+
+@media (max-width: 768px) {
+    .nav-brand img { height: 50px !important; }
+    .brand-title { font-size: 1.2rem !important; }
+    .brand-sub { font-size: 0.42rem !important; letter-spacing: 4px !important; }
+}
