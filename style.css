@@ -4848,3 +4848,14 @@ button{border:none;outline:none;cursor:pointer;font-family:var(--bd)}
     text-transform: uppercase !important;
     letter-spacing: 0.5px !important;
 }
+
+/* =========================================================
+   NAVBAR BRAND TEXT - BOTH BLACK (FINAL)
+========================================================= */
+.brand-title {
+    color: #111111 !important;
+}
+.brand-sub {
+    color: #111111 !important;
+    opacity: 0.65 !important;
+}
