@@ -4775,3 +4775,24 @@ button{border:none;outline:none;cursor:pointer;font-family:var(--bd)}
     margin-top: 1px !important;
     opacity: 0.7 !important;
 }
+
+/* =========================================================
+   HERO SECTION - BACKGROUND IMAGE FIX
+========================================================= */
+.hero {
+    background: url('hero-bg-new.png') center right/cover no-repeat !important;
+}
+
+/* Ensure the overlay allows the image to be seen nicely */
+.hero-overlay {
+    background: linear-gradient(to right, rgba(17,17,17,0.95) 0%, rgba(17,17,17,0.85) 40%, rgba(17,17,17,0.2) 100%) !important;
+}
+
+@media (max-width: 768px) {
+    .hero {
+        background-position: 70% center !important;
+    }
+    .hero-overlay {
+        background: linear-gradient(to bottom, rgba(17,17,17,0.8) 0%, rgba(17,17,17,0.95) 100%) !important;
+    }
+}
