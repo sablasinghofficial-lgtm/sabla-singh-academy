@@ -4690,3 +4690,23 @@ button{border:none;outline:none;cursor:pointer;font-family:var(--bd)}
 @media (max-width: 768px) {
     .crs-card-img { height: 200px !important; }
 }
+
+/* =========================================================
+   ABOUT SECTION - BIG PORTRAIT PHOTO FIX
+========================================================= */
+.apm-img-wrap {
+    height: 550px !important;
+    overflow: hidden !important;
+    border-radius: 16px !important;
+}
+.apm-img-wrap img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center top !important;
+}
+.about-slideshow { display: none !important; }
+
+@media (max-width: 768px) {
+    .apm-img-wrap { height: 380px !important; }
+}
