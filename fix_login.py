@@ -1,13 +1,11 @@
-﻿import os
 import re
 
-firebase_scripts = '''
-    <script type="module" src="js/firebase-init.js"></script>
-    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
-    <script src="js/cloudinary-init.js"></script>
-'''
+with open('admin/login.html', 'r', encoding='utf-8') as f:
+    content = f.read()
 
-login_script = '''<script type="module">
+# Add mapping logic to login.html
+new_script = """
+    <script type="module">
         import { auth, signInWithEmailAndPassword } from './js/firebase-init.js';
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -15,28 +13,33 @@ login_script = '''<script type="module">
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             btn.disabled = true;
 
-            const email = document.getElementById('username').value;
+            let email = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
+
+            // Map custom username to actual Firebase email
+            if (email === 'Sablasingh@0404' || email.toLowerCase() === 'admin') {
+                email = 'sablasinghofficial@gmail.com';
+            }
 
             try {
                 await signInWithEmailAndPassword(auth, email, password);
                 window.location.href = 'dashboard.html';
             } catch (err) {
                 document.getElementById('errorMsg').style.display = 'block';
-                document.getElementById('errorMsg').innerText = err.message;
+                document.getElementById('errorMsg').innerText = "Error: Invalid credentials or user not found.";
+                console.error(err);
                 btn.innerHTML = 'Sign In';
                 btn.disabled = false;
             }
         });
-    </script>'''
+    </script>
+"""
 
-# Modify admin/login.html
-with open('admin/login.html', 'r', encoding='utf-8') as f:
-    content = f.read()
-if 'firebase-init.js' not in content:
-    content = content.replace('</head>', firebase_scripts + '\n</head>')
-    content = re.sub(r'<script>.*?</script>', login_script, content, flags=re.DOTALL)
+content = re.sub(r'<script type="module">.*?</script>', new_script, content, flags=re.DOTALL)
+# Also fix logo in admin login just in case
+content = content.replace('src="../logo.png"', 'src="../logo_transparent.png"')
+
 with open('admin/login.html', 'w', encoding='utf-8') as f:
     f.write(content)
 
-print("Updated login.html")
+print("login.html updated")

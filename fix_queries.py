@@ -1,96 +1,6 @@
-﻿<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Enquiries - Sabla Singh Academy</title>
-    <link rel="stylesheet" href="css/admin.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .filter-bar { display: flex; gap: 15px; margin-bottom: 20px; }
-        .filter-bar select, .filter-bar input { padding: 10px 15px; border: 1px solid var(--border); border-radius: 8px; outline: none; }
-        .msg-cell { max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
-        
-        /* Modal */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; }
-        .modal-content { background: #fff; padding: 30px; border-radius: 16px; width: 100%; max-width: 500px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border); }
-        .modal-header h3 { color: var(--primary); font-family: 'Playfair Display', serif; font-size: 1.4rem; }
-        .close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); }
-        .modal-body p { margin-bottom: 10px; font-size: 0.95rem; }
-        .modal-body strong { color: var(--primary); display: inline-block; width: 120px; }
-        .modal-msg { background: var(--bg-light); padding: 15px; border-radius: 8px; margin-top: 15px; font-style: italic; color: #555; white-space: pre-wrap; }
-        
-        .status-select { padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border); outline: none; font-weight: 600; font-size: 0.85rem; }
-    </style>
-</head>
-<body>
-    <div class="sidebar">
-        <div class="sidebar-logo"><img src="../logo_transparent.png" alt="Logo"></div>
-        <div class="sidebar-menu">
-            <a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a>
-            <a href="queries.html" class="active"><i class="fas fa-envelope"></i> Enquiries</a>
-            <a href="services.html"><i class="fas fa-gem"></i> Services</a>
-            <a href="courses.html"><i class="fas fa-graduation-cap"></i> Courses</a>
-            <a href="gallery.html"><i class="fas fa-images"></i> Gallery</a>
-            <a href="vlogs.html"><i class="fas fa-video"></i> Vlogs</a>
-            <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
-        </div>
-    </div>
+import re
 
-    <div class="main-content">
-        <div class="topbar">
-            <div class="topbar-title">Enquiries Inbox</div>
-            <div class="topbar-user">
-                <button onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
-            </div>
-        </div>
-
-        <div class="content-area">
-            <div class="filter-bar">
-                <input type="text" id="searchInput" placeholder="Search by name or phone..." onkeyup="filterQueries()" style="flex: 1; max-width: 300px;">
-                <select id="statusFilter" onchange="filterQueries()">
-                    <option value="All">All Statuses</option>
-                    <option value="New">New</option>
-                    <option value="Contacted">Contacted</option>
-                    <option value="Resolved">Resolved</option>
-                </select>
-            </div>
-
-            <div class="table-card">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Name</th>
-                            <th>Contact</th>
-                            <th>Interested In</th>
-                            <th>Message</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="queriesTable">
-                        <tr><td colspan="7" style="text-align:center;">Loading...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- View Modal -->
-    <div class="modal" id="viewModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Enquiry Details</h3>
-                <button class="close-btn" onclick="closeModal()">×</button>
-            </div>
-            <div class="modal-body" id="modalBody">
-                <!-- Content injected via JS -->
-            </div>
-        </div>
-    </div>
-
-    
+html_script = """
     <script type="module">
         import { auth, db, collection, getDocs, doc, deleteDoc, updateDoc, onAuthStateChanged, signOut } from './js/firebase-init.js';
 
@@ -220,6 +130,15 @@
             window.location.href = 'login.html';
         }
     </script>
+"""
 
-</body>
-</html>
+with open('admin/queries.html', 'r', encoding='utf-8') as f:
+    content = f.read()
+
+content = re.sub(r'<script>\s*let allQueries = \[\];.*?</script>', html_script, content, flags=re.DOTALL)
+content = content.replace('src="../logo.png"', 'src="../logo_transparent.png"')
+
+with open('admin/queries.html', 'w', encoding='utf-8') as f:
+    f.write(content)
+
+print("queries.html updated")

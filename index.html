@@ -147,12 +147,32 @@
 
     <!-- Left: Image with overlays -->
     <div class="apm-left" data-aos="fade-right" data-aos-duration="900">
-      <div class="apm-img-wrap">
-        <img src="founder.jpg" alt="Sabla Singh - Founder & Director">
+      <div class="apm-img-wrap swiper about-vert-slider" style="overflow: hidden; width: 100%; height: 100%;">
+        <div class="swiper-wrapper">
+          <div class="swiper-slide"><img src="gal16.jpg" alt="Makeup Academy" style="object-fit: cover; width: 100%; height: 100%;"></div>
+          <div class="swiper-slide"><img src="gal14.jpg" alt="Bridal Makeup" style="object-fit: cover; width: 100%; height: 100%;"></div>
+          <div class="swiper-slide"><img src="gal8.jpg" alt="Hair Styling" style="object-fit: cover; width: 100%; height: 100%;"></div>
+          <div class="swiper-slide"><img src="gal9.jpg" alt="Cosmetology" style="object-fit: cover; width: 100%; height: 100%;"></div>
+          <div class="swiper-slide"><img src="gal17.jpg" alt="Academy Class" style="object-fit: cover; width: 100%; height: 100%;"></div>
+        </div>
         <div class="apm-corner apm-tl"></div>
         <div class="apm-corner apm-br"></div>
-        
       </div>
+      
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          new Swiper('.about-vert-slider', {
+            direction: 'vertical',
+            loop: true,
+            autoplay: {
+              delay: 2000,
+              disableOnInteraction: false,
+            },
+            effect: 'slide',
+            speed: 800
+          });
+        });
+      </script>
       <div class="apm-mini-stats">
         <div class="apm-mstat"><span class="apm-ms-num">2500+</span><span class="apm-ms-lbl">Happy Clients</span></div>
         <div class="apm-divider"></div>

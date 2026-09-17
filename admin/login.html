@@ -13,7 +13,7 @@
 </head>
 <body class="login-page">
     <div class="login-card">
-        <img src="../logo.png" alt="Sabla Singh Academy">
+        <img src="../logo_transparent.png" alt="Sabla Singh Academy">
         <h2>Admin Portal</h2>
         <form id="loginForm">
             <div class="form-group">
@@ -29,6 +29,7 @@
         </form>
     </div>
 
+    
     <script type="module">
         import { auth, signInWithEmailAndPassword } from './js/firebase-init.js';
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
@@ -37,19 +38,26 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             btn.disabled = true;
 
-            const email = document.getElementById('username').value;
+            let email = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
+
+            // Map custom username to actual Firebase email
+            if (email === 'Sablasingh@0404' || email.toLowerCase() === 'admin') {
+                email = 'sablasinghofficial@gmail.com';
+            }
 
             try {
                 await signInWithEmailAndPassword(auth, email, password);
                 window.location.href = 'dashboard.html';
             } catch (err) {
                 document.getElementById('errorMsg').style.display = 'block';
-                document.getElementById('errorMsg').innerText = err.message;
+                document.getElementById('errorMsg').innerText = "Error: Invalid credentials or user not found.";
+                console.error(err);
                 btn.innerHTML = 'Sign In';
                 btn.disabled = false;
             }
         });
     </script>
+
 </body>
 </html>

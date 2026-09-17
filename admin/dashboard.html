@@ -5,10 +5,11 @@
     <title>Dashboard - Sabla Singh Academy</title>
     <link rel="stylesheet" href="css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script type="module" src="js/firebase-init.js"></script>
 </head>
 <body>
     <div class="sidebar">
-        <div class="sidebar-logo"><img src="../logo.png" alt="Logo"></div>
+        <div class="sidebar-logo"><img src="../logo_transparent.png" alt="Logo"></div>
         <div class="sidebar-menu">
             <a href="dashboard.html" class="active"><i class="fas fa-home"></i> Dashboard</a>
             <a href="queries.html"><i class="fas fa-envelope"></i> Enquiries <span id="newQCount" style="background:#dc3545;color:#fff;padding:2px 6px;border-radius:10px;font-size:0.7rem;margin-left:auto;display:none;">0</span></a>
@@ -72,32 +73,43 @@
         </div>
     </div>
 
-    <script>
+    
+    <script type="module">
+        import { auth, db, collection, getDocs, onAuthStateChanged, signOut } from './js/firebase-init.js';
+        
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            document.getElementById('adminName').innerText = user.email.split('@')[0];
+            await loadDashboard();
+        });
+
         async function loadDashboard() {
             try {
-                // Auth check
-                const meRes = await fetch('/api/auth/me');
-                if(!meRes.ok) throw new Error('Unauthorized');
-                const me = await meRes.json();
-                document.getElementById('adminName').innerText = me.username.split('@')[0];
+                // Queries
+                const qSnap = await getDocs(collection(db, 'queries'));
+                const queries = [];
+                let newQueries = 0;
+                qSnap.forEach(doc => {
+                    const data = doc.data();
+                    queries.push({ id: doc.id, ...data });
+                    if(data.status === 'New') newQueries++;
+                });
+                
+                // Sort by date desc (assuming created_at exists)
+                queries.sort((a,b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
 
-                // Stats
-                const statRes = await fetch('/api/admin/stats');
-                const stats = await statRes.json();
-                document.getElementById('statQueries').innerText = stats.queries;
-                document.getElementById('statServices').innerText = stats.services;
-                document.getElementById('statCourses').innerText = stats.courses;
-                document.getElementById('statGallery').innerText = stats.gallery;
+                document.getElementById('statQueries').innerText = queries.length;
 
-                if (stats.newQueries > 0) {
+                if (newQueries > 0) {
                     const badge = document.getElementById('newQCount');
                     badge.style.display = 'inline-block';
-                    badge.innerText = stats.newQueries;
+                    badge.innerText = newQueries;
                 }
 
                 // Recent queries
-                const qRes = await fetch('/api/admin/queries');
-                const queries = await qRes.json();
                 const tbody = document.getElementById('recentQueries');
                 tbody.innerHTML = '';
                 
@@ -105,30 +117,40 @@
                     tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#888;">No enquiries yet.</td></tr>';
                 } else {
                     queries.slice(0, 5).forEach(q => {
-                        const date = new Date(q.created_at).toLocaleDateString();
-                        const badgeClass = q.status.toLowerCase();
+                        const date = q.created_at ? new Date(q.created_at).toLocaleDateString() : '-';
+                        const badgeClass = (q.status || 'New').toLowerCase();
                         tbody.innerHTML += `
                             <tr>
                                 <td>${date}</td>
                                 <td><strong>${q.name}</strong></td>
                                 <td>${q.phone}</td>
                                 <td>${q.interested_in || '-'}</td>
-                                <td><span class="badge ${badgeClass}">${q.status}</span></td>
+                                <td><span class="badge ${badgeClass}">${q.status || 'New'}</span></td>
                             </tr>
                         `;
                     });
                 }
+
+                // Mock other stats since we might not have collections yet
+                const sSnap = await getDocs(collection(db, 'services'));
+                document.getElementById('statServices').innerText = sSnap.size;
+                
+                const cSnap = await getDocs(collection(db, 'courses'));
+                document.getElementById('statCourses').innerText = cSnap.size;
+                
+                const gSnap = await getDocs(collection(db, 'gallery'));
+                document.getElementById('statGallery').innerText = gSnap.size;
+
             } catch (err) {
-                window.location.href = 'login.html';
+                console.error("Dashboard error:", err);
             }
         }
 
-        async function logout() {
-            await fetch('/api/auth/logout', { method: 'POST' });
+        window.logout = async function() {
+            await signOut(auth);
             window.location.href = 'login.html';
         }
-
-        loadDashboard();
     </script>
+
 </body>
 </html>

@@ -4859,3 +4859,24 @@ button{border:none;outline:none;cursor:pointer;font-family:var(--bd)}
     color: #111111 !important;
     opacity: 0.65 !important;
 }
+
+/* =========================================================
+   VERTICAL ABOUT SLIDER FIX
+========================================================= */
+.about-vert-slider {
+    height: 600px !important;
+    border-radius: 20px !important;
+}
+.about-vert-slider .swiper-slide {
+    height: 100% !important;
+}
+.about-vert-slider img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+}
+@media (max-width: 900px) {
+    .about-vert-slider {
+        height: 400px !important;
+    }
+}
