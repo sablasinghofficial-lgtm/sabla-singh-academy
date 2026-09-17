@@ -4780,7 +4780,7 @@ button{border:none;outline:none;cursor:pointer;font-family:var(--bd)}
    HERO SECTION - BACKGROUND IMAGE FIX
 ========================================================= */
 .hero {
-    background: url('hero-bg-blue.jpg') center right/cover no-repeat !important;
+    background: url('hero-bg-new.png') center right/cover no-repeat !important;
 }
 
 /* Ensure the overlay allows the image to be seen nicely */
