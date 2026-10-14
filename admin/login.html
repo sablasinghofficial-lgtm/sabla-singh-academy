@@ -12,7 +12,8 @@
         <img src="../logo_transparent.png" alt="Sabla Singh Academy" style="max-height: 80px; width: auto; margin-bottom: 20px;">
         <h2>Admin Portal</h2>
         <p style="color: #666; font-size: 0.9rem; margin-bottom: 25px;">Enter your credentials to access the academy management panel</p>
-        <form id="loginForm">
+        
+        <form id="loginForm" onsubmit="handleLogin(event); return false;">
             <div class="form-group">
                 <label>Username / Email</label>
                 <input type="text" id="username" placeholder="e.g. Sablasingh@0404" required autocomplete="username">
@@ -21,60 +22,74 @@
                 <label>Password</label>
                 <input type="password" id="password" placeholder="Enter password" required autocomplete="current-password">
             </div>
-            <button type="submit" class="btn-gold" id="loginBtn">Sign In</button>
+            <button type="button" class="btn-gold" id="loginBtn" onclick="handleLogin(event)">SIGN IN</button>
             <div class="error-msg" id="errorMsg" style="display:none; color: #dc3545; background: #ffe6e6; padding: 10px; border-radius: 6px; margin-top: 15px; font-size: 0.85rem;"></div>
         </form>
     </div>
 
-    <script type="module">
-        import { auth, signInWithEmailAndPassword } from './js/firebase-init.js';
-
-        // If already logged in, redirect to dashboard
+    <script>
+        // Check if already logged in
         if (localStorage.getItem('admin_logged_in') === 'true') {
-            window.location.href = 'dashboard.html';
+            window.location.replace('dashboard.html');
         }
 
-        const validUsernames = ['sablasingh@0404', 'sablasinghofficial@gmail.com', 'admin'];
-        const validPassword = 'sablasingh123';
-
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('loginBtn');
-            const errorMsg = document.getElementById('errorMsg');
+        function handleLogin(e) {
+            if (e && e.preventDefault) e.preventDefault();
             
+            var userField = document.getElementById('username');
+            var passField = document.getElementById('password');
+            var errorMsg = document.getElementById('errorMsg');
+            var btn = document.getElementById('loginBtn');
+
+            var user = userField.value.trim().toLowerCase();
+            var pass = passField.value.trim();
+
             errorMsg.style.display = 'none';
+
+            if (!user || !pass) {
+                errorMsg.style.display = 'block';
+                errorMsg.innerText = 'Please enter both username and password.';
+                return false;
+            }
+
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing In...';
             btn.disabled = true;
 
-            const inputUser = document.getElementById('username').value.trim();
-            const inputPass = document.getElementById('password').value;
+            var validUsers = [
+                'sablasingh@0404',
+                'sablasinghofficial@gmail.com',
+                'admin'
+            ];
+            var validPass = 'sablasingh123';
 
-            // Check admin credentials
-            const isValidUser = validUsernames.includes(inputUser.toLowerCase());
-            const isValidPass = (inputPass === validPassword);
-
-            if (isValidUser && isValidPass) {
-                // Set authenticated admin session
+            if (validUsers.indexOf(user) !== -1 && pass === validPass) {
                 localStorage.setItem('admin_logged_in', 'true');
                 localStorage.setItem('admin_user', 'Sabla Singh');
+                btn.innerHTML = '<i class="fas fa-check"></i> Success! Opening...';
+                btn.style.background = '#28a745';
                 
-                // Attempt Firebase Auth in background if enabled
-                try {
-                    if (auth && signInWithEmailAndPassword) {
-                        await signInWithEmailAndPassword(auth, 'sablasinghofficial@gmail.com', inputPass);
-                    }
-                } catch (fbErr) {
-                    console.log('Firebase Auth fallback active:', fbErr.message);
-                }
-
-                // Redirect to dashboard
-                window.location.href = 'dashboard.html';
+                setTimeout(function() {
+                    window.location.replace('dashboard.html');
+                }, 400);
+                return false;
             } else {
-                errorMsg.style.display = 'block';
-                errorMsg.innerText = 'Invalid username or password. Please try again.';
-                btn.innerHTML = 'Sign In';
-                btn.disabled = false;
+                setTimeout(function() {
+                    errorMsg.style.display = 'block';
+                    errorMsg.innerText = 'Invalid username or password. Please try again.';
+                    btn.innerHTML = 'SIGN IN';
+                    btn.disabled = false;
+                    btn.style.background = '';
+                }, 400);
+                return false;
             }
+        }
+
+        // Allow Enter key in inputs
+        document.getElementById('username').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') handleLogin(e);
+        });
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') handleLogin(e);
         });
     </script>
 </body>
