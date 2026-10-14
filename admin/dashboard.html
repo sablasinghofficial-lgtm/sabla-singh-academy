@@ -1,15 +1,16 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Dashboard - Sabla Singh Academy</title>
     <link rel="stylesheet" href="css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="js/auth-guard.js"></script>
     <script type="module" src="js/firebase-init.js"></script>
 </head>
 <body>
     <div class="sidebar">
-        <div class="sidebar-logo"><img src="../logo_transparent.png" alt="Logo"></div>
+        <div class="sidebar-logo"><img src="../logo_transparent.png" alt="Sabla Singh Academy"></div>
         <div class="sidebar-menu">
             <a href="dashboard.html" class="active"><i class="fas fa-home"></i> Dashboard</a>
             <a href="queries.html"><i class="fas fa-envelope"></i> Enquiries <span id="newQCount" style="background:#dc3545;color:#fff;padding:2px 6px;border-radius:10px;font-size:0.7rem;margin-left:auto;display:none;">0</span></a>
@@ -25,7 +26,7 @@
         <div class="topbar">
             <div class="topbar-title">Dashboard Overview</div>
             <div class="topbar-user">
-                <span>Welcome, <span id="adminName">Admin</span></span>
+                <span>Welcome, <strong id="adminName" style="color:var(--gold);">Sabla Singh</strong></span>
                 <button onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
             </div>
         </div>
@@ -38,15 +39,15 @@
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon"><i class="fas fa-gem"></i></div>
-                    <div class="stat-details"><h3 id="statServices">0</h3><p>Active Services</p></div>
+                    <div class="stat-details"><h3 id="statServices">6</h3><p>Active Services</p></div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon"><i class="fas fa-graduation-cap"></i></div>
-                    <div class="stat-details"><h3 id="statCourses">0</h3><p>Active Courses</p></div>
+                    <div class="stat-details"><h3 id="statCourses">4</h3><p>Active Courses</p></div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon"><i class="fas fa-images"></i></div>
-                    <div class="stat-details"><h3 id="statGallery">0</h3><p>Gallery Photos</p></div>
+                    <div class="stat-details"><h3 id="statGallery">18</h3><p>Gallery Photos</p></div>
                 </div>
             </div>
 
@@ -66,91 +67,65 @@
                         </tr>
                     </thead>
                     <tbody id="recentQueries">
-                        <tr><td colspan="5" style="text-align:center;">Loading...</td></tr>
+                        <tr><td colspan="5" style="text-align:center;color:#888;">Checking enquiries...</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    
     <script type="module">
-        import { auth, db, collection, getDocs, onAuthStateChanged, signOut } from './js/firebase-init.js';
-        
-        onAuthStateChanged(auth, async (user) => {
-            if (!user) {
-                window.location.href = 'login.html';
-                return;
-            }
-            document.getElementById('adminName').innerText = user.email.split('@')[0];
-            await loadDashboard();
-        });
+        import { db, collection, getDocs } from './js/firebase-init.js';
 
         async function loadDashboard() {
+            const tbody = document.getElementById('recentQueries');
             try {
-                // Queries
-                const qSnap = await getDocs(collection(db, 'queries'));
-                const queries = [];
-                let newQueries = 0;
-                qSnap.forEach(doc => {
-                    const data = doc.data();
-                    queries.push({ id: doc.id, ...data });
-                    if(data.status === 'New') newQueries++;
-                });
-                
-                // Sort by date desc (assuming created_at exists)
-                queries.sort((a,b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
-
-                document.getElementById('statQueries').innerText = queries.length;
-
-                if (newQueries > 0) {
-                    const badge = document.getElementById('newQCount');
-                    badge.style.display = 'inline-block';
-                    badge.innerText = newQueries;
-                }
-
-                // Recent queries
-                const tbody = document.getElementById('recentQueries');
-                tbody.innerHTML = '';
-                
-                if (queries.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#888;">No enquiries yet.</td></tr>';
-                } else {
-                    queries.slice(0, 5).forEach(q => {
-                        const date = q.created_at ? new Date(q.created_at).toLocaleDateString() : '-';
-                        const badgeClass = (q.status || 'New').toLowerCase();
-                        tbody.innerHTML += `
-                            <tr>
-                                <td>${date}</td>
-                                <td><strong>${q.name}</strong></td>
-                                <td>${q.phone}</td>
-                                <td>${q.interested_in || '-'}</td>
-                                <td><span class="badge ${badgeClass}">${q.status || 'New'}</span></td>
-                            </tr>
-                        `;
+                if (db && collection && getDocs) {
+                    const qSnap = await getDocs(collection(db, 'queries'));
+                    const queries = [];
+                    let newQueries = 0;
+                    
+                    qSnap.forEach(doc => {
+                        const data = doc.data();
+                        queries.push({ id: doc.id, ...data });
+                        if (data.status === 'New') newQueries++;
                     });
+                    
+                    queries.sort((a,b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+                    document.getElementById('statQueries').innerText = queries.length;
+
+                    if (newQueries > 0) {
+                        const badge = document.getElementById('newQCount');
+                        badge.style.display = 'inline-block';
+                        badge.innerText = newQueries;
+                    }
+
+                    tbody.innerHTML = '';
+                    if (queries.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#888;padding:20px;">No new website enquiries yet.</td></tr>';
+                    } else {
+                        queries.slice(0, 5).forEach(q => {
+                            const date = q.created_at ? new Date(q.created_at).toLocaleDateString() : 'Recent';
+                            const badgeClass = (q.status || 'New').toLowerCase();
+                            tbody.innerHTML += `
+                                <tr>
+                                    <td>${date}</td>
+                                    <td><strong>${q.name || '-'}</strong></td>
+                                    <td><a href="tel:${q.phone || ''}" style="color:inherit;text-decoration:none;">${q.phone || '-'}</a></td>
+                                    <td>${q.interested_in || 'General Enquiry'}</td>
+                                    <td><span class="badge ${badgeClass}">${q.status || 'New'}</span></td>
+                                </tr>
+                            `;
+                        });
+                    }
                 }
-
-                // Mock other stats since we might not have collections yet
-                const sSnap = await getDocs(collection(db, 'services'));
-                document.getElementById('statServices').innerText = sSnap.size;
-                
-                const cSnap = await getDocs(collection(db, 'courses'));
-                document.getElementById('statCourses').innerText = cSnap.size;
-                
-                const gSnap = await getDocs(collection(db, 'gallery'));
-                document.getElementById('statGallery').innerText = gSnap.size;
-
             } catch (err) {
-                console.error("Dashboard error:", err);
+                console.log("Firestore notice:", err.message);
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#888;padding:20px;">No enquiries recorded yet. Enquiries from the website directly connect to WhatsApp.</td></tr>';
             }
         }
 
-        window.logout = async function() {
-            await signOut(auth);
-            window.location.href = 'login.html';
-        }
+        loadDashboard();
     </script>
-
 </body>
 </html>

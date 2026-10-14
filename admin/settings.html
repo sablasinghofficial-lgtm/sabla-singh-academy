@@ -1,14 +1,15 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Settings - Sabla Singh Academy</title>
     <link rel="stylesheet" href="css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="js/auth-guard.js"></script>
 </head>
 <body>
     <div class="sidebar">
-        <div class="sidebar-logo"><img src="../logo.png" alt="Logo"></div>
+        <div class="sidebar-logo"><img src="../logo_transparent.png" alt="Logo"></div>
         <div class="sidebar-menu">
             <a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a>
             <a href="queries.html"><i class="fas fa-envelope"></i> Enquiries</a>
@@ -28,63 +29,72 @@
             </div>
         </div>
         <div class="content-area">
-            <div class="login-card" style="margin: 0 auto; max-width: 800px; text-align: left; padding: 50px;">
-                <h2 style="font-family:'Playfair Display',serif; color:var(--primary); font-size:2.5rem; margin-bottom: 10px;">Contact Information</h2>
-                <p style="color:var(--text-muted); font-size:1.1rem; margin-bottom: 40px; border-bottom: 1px solid var(--border); padding-bottom: 20px;">Manage your academy's core details and contact information.</p>
+            <div class="login-card" style="margin: 0 auto; max-width: 800px; text-align: left; padding: 45px; border-radius: 16px;">
+                <h2 style="font-family:'Playfair Display',serif; color:var(--primary); font-size:2.2rem; margin-bottom: 8px;">Contact & Academy Information</h2>
+                <p style="color:var(--text-muted); font-size:1rem; margin-bottom: 35px; border-bottom: 1px solid var(--border); padding-bottom: 15px;">Manage your academy's official contact information displayed across the website.</p>
                 
                 <form id="settingsForm">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
                         <div class="form-group">
                             <label><i class="fas fa-building" style="color:var(--gold);"></i> Academy Name</label>
-                            <input type="text" value="Sabla Singh Academy" class="premium-input">
+                            <input type="text" id="setAcademy" value="Sabla Singh Academy" class="premium-input">
                         </div>
                         <div class="form-group">
                             <label><i class="fas fa-user-tie" style="color:var(--gold);"></i> Founder Name</label>
-                            <input type="text" value="Sabla Singh" class="premium-input">
+                            <input type="text" id="setFounder" value="Sabla Singh" class="premium-input">
                         </div>
                         <div class="form-group">
-                            <label><i class="fas fa-phone-alt" style="color:var(--gold);"></i> Primary Phone</label>
-                            <input type="text" value="+91 8603388406" class="premium-input">
+                            <label><i class="fas fa-phone-alt" style="color:var(--gold);"></i> Primary Phone / WhatsApp</label>
+                            <input type="text" id="setPhone" value="+91 8603388406" class="premium-input">
                         </div>
                         <div class="form-group">
-                            <label><i class="fas fa-envelope" style="color:var(--gold);"></i> Email Address</label>
-                            <input type="text" value="sablasinghofficial@gmail.com" class="premium-input">
+                            <label><i class="fas fa-envelope" style="color:var(--gold);"></i> Official Email</label>
+                            <input type="text" id="setEmail" value="sablasinghofficial@gmail.com" class="premium-input">
                         </div>
                         <div class="form-group" style="grid-column: 1 / -1;">
-                            <label><i class="fas fa-map-marker-alt" style="color:var(--gold);"></i> Full Address</label>
-                            <input type="text" value="Studio S, Shivshakti Nagar, Opp. Sarala Birla Public School, Mahilong, Ranchi" class="premium-input">
+                            <label><i class="fas fa-map-marker-alt" style="color:var(--gold);"></i> Full Academy Address</label>
+                            <input type="text" id="setAddress" value="Studio S, Shivshakti Nagar, Opp. Sarala Birla Public School, Mahilong, Ranchi, Jharkhand 835103" class="premium-input">
                         </div>
                     </div>
                     
-                    <button type="button" class="btn-gold" style="margin-top: 30px; font-size: 1.3rem; padding: 20px;" onclick="saveSettings(this)"><i class="fas fa-save"></i> Save & Update Details</button>
+                    <button type="button" class="btn-gold" style="margin-top: 25px; font-size: 1.15rem; padding: 15px 30px;" onclick="saveSettings(this)"><i class="fas fa-save"></i> Save & Update Details</button>
                 </form>
             </div>
         </div>
     </div>
 
     <script>
-        function saveSettings(btn) {
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
-            btn.disabled = true;
-            
-            setTimeout(() => {
-                btn.innerHTML = '<i class="fas fa-check"></i> Updated Successfully';
-                btn.style.background = '#28a745';
-                btn.style.color = '#fff';
-                
-                setTimeout(() => {
-                    btn.innerHTML = originalText;
-                    btn.style.background = '';
-                    btn.style.color = '';
-                    btn.disabled = false;
-                }, 2000);
-            }, 1000);
+        // Load saved settings if any
+        const savedSettings = JSON.parse(localStorage.getItem('admin_settings'));
+        if (savedSettings) {
+            if (savedSettings.academy) document.getElementById('setAcademy').value = savedSettings.academy;
+            if (savedSettings.founder) document.getElementById('setFounder').value = savedSettings.founder;
+            if (savedSettings.phone) document.getElementById('setPhone').value = savedSettings.phone;
+            if (savedSettings.email) document.getElementById('setEmail').value = savedSettings.email;
+            if (savedSettings.address) document.getElementById('setAddress').value = savedSettings.address;
         }
 
-        async function logout() {
-            await fetch('/api/auth/logout', { method: 'POST' });
-            window.location.href = 'login.html';
+        function saveSettings(btn) {
+            const settings = {
+                academy: document.getElementById('setAcademy').value.trim(),
+                founder: document.getElementById('setFounder').value.trim(),
+                phone: document.getElementById('setPhone').value.trim(),
+                email: document.getElementById('setEmail').value.trim(),
+                address: document.getElementById('setAddress').value.trim()
+            };
+            
+            localStorage.setItem('admin_settings', JSON.stringify(settings));
+
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Updated Successfully';
+            btn.style.background = '#28a745';
+            btn.style.color = '#fff';
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.style.background = '';
+                btn.style.color = '';
+            }, 1500);
         }
     </script>
 </body>

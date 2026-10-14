@@ -1,28 +1,27 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Vlogs - Sabla Singh Academy</title>
     <link rel="stylesheet" href="css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="js/auth-guard.js"></script>
     <style>
         .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .page-header p { font-size: 1.2rem; }
-        .btn-add { background: var(--primary); color: #fff; border: none; padding: 15px 30px; border-radius: 12px; cursor: pointer; display: flex; gap: 10px; align-items: center; font-size: 1.2rem; font-weight: 700; }
-        .btn-add:hover { background: #000; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        .vlog-thumb-preview { width: 140px; height: 80px; object-fit: cover; border-radius: 12px; background: #eee; }
-        
-        /* Modal */
+        .page-header p { font-size: 1.1rem; }
+        .btn-add { background: var(--primary); color: #fff; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; display: flex; gap: 10px; align-items: center; font-size: 1.05rem; font-weight: 700; }
+        .btn-add:hover { background: #000; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .vlog-thumb-preview { width: 120px; height: 75px; object-fit: cover; border-radius: 8px; background: #eee; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; }
-        .modal-content { background: #fff; padding: 40px; border-radius: 20px; width: 100%; max-width: 600px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--border); }
-        .modal-header h3 { color: var(--primary); font-family: 'Playfair Display', serif; font-size: 2rem; }
-        .close-btn { background: none; border: none; font-size: 2rem; cursor: pointer; color: var(--text-muted); }
+        .modal-content { background: #fff; padding: 35px; border-radius: 16px; width: 100%; max-width: 600px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+        .modal-header h3 { color: var(--primary); font-family: 'Playfair Display', serif; font-size: 1.8rem; }
+        .close-btn { background: none; border: none; font-size: 1.8rem; cursor: pointer; color: var(--text-muted); }
     </style>
 </head>
 <body>
     <div class="sidebar">
-        <div class="sidebar-logo"><img src="../logo.png" alt="Logo"></div>
+        <div class="sidebar-logo"><img src="../logo_transparent.png" alt="Logo"></div>
         <div class="sidebar-menu">
             <a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a>
             <a href="queries.html"><i class="fas fa-envelope"></i> Enquiries</a>
@@ -44,7 +43,7 @@
 
         <div class="content-area">
             <div class="page-header">
-                <p style="color:var(--text-muted);">Manage the videos/reels shown on the Vlogs page.</p>
+                <p style="color:var(--text-muted);">Manage bridal masterclasses, student testimonials & video reels shown on the Vlogs page.</p>
                 <button class="btn-add" onclick="openModal()"><i class="fas fa-plus"></i> Add New Video</button>
             </div>
 
@@ -59,7 +58,7 @@
                         </tr>
                     </thead>
                     <tbody id="vlogsTable">
-                        <tr><td colspan="4" style="text-align:center;">Loading...</td></tr>
+                        <tr><td colspan="4" style="text-align:center;">Loading videos...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -78,52 +77,62 @@
                 
                 <div class="form-group">
                     <label>Video Title</label>
-                    <input type="text" id="vTitle" placeholder="e.g. Bridal Makeup Transformation" required>
+                    <input type="text" id="vTitle" placeholder="e.g. Bridal Makeup Transformation Masterclass" required>
                 </div>
                 
                 <div class="form-group">
-                    <label>Thumbnail Photo Name / Link (Cover Image)</label>
-                    <input type="text" id="vThumb" placeholder="e.g. gal1.jpg OR https://...">
+                    <label>Thumbnail Photo Name / Link</label>
+                    <input type="text" id="vThumb" placeholder="e.g. gal14.jpg OR https://...">
                 </div>
 
                 <div class="form-group">
                     <label>Video Link (YouTube URL or Local MP4)</label>
-                    <input type="text" id="vLink" placeholder="e.g. sablasinghofficial.mp4 OR https://youtube.com/..." required>
+                    <input type="text" id="vLink" placeholder="e.g. https://www.youtube.com/watch?v=... or reel link" required>
                 </div>
                 
-                <button type="button" class="btn-gold" style="font-size:1.3rem; padding: 15px; margin-top: 15px;" onclick="saveVlog(this)"><i class="fas fa-save"></i> Save Video</button>
+                <button type="button" class="btn-gold" style="font-size:1.1rem; padding: 14px; margin-top: 15px;" onclick="saveVlog(this)"><i class="fas fa-save"></i> Save Video</button>
             </form>
         </div>
     </div>
 
     <script>
-        let allVlogs = [];
+        const defaultVlogs = [
+            {
+                id: 1,
+                title: "Complete Bridal HD Transformation - Step by Step",
+                thumbnail: "gal14.jpg",
+                video_url: "https://www.instagram.com/sablasinghofficial/"
+            },
+            {
+                id: 2,
+                title: "Academy Student Masterclass & Certification Ceremony",
+                thumbnail: "gal11.jpg",
+                video_url: "https://www.instagram.com/sablasinghofficial/"
+            },
+            {
+                id: 3,
+                title: "Airbrush Makeup & High-Definition Glow Tutorial",
+                thumbnail: "gal13.jpg",
+                video_url: "https://www.instagram.com/sablasinghofficial/"
+            }
+        ];
 
-        async function loadVlogs() {
-            const res = await fetch('/api/admin/vlogs');
-            if (res.status === 401) window.location.href = 'login.html';
-            allVlogs = await res.json();
-            
+        let allVlogs = JSON.parse(localStorage.getItem('admin_vlogs')) || defaultVlogs;
+
+        function renderVlogs() {
             const tbody = document.getElementById('vlogsTable');
             tbody.innerHTML = '';
             
-            if(allVlogs.length === 0) {
-                 tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No videos found.</td></tr>';
-                 return;
-            }
-
             allVlogs.forEach(v => {
-                const thumb = v.thumbnail ? (v.thumbnail.startsWith('http') ? v.thumbnail : '../' + v.thumbnail) : '../logo.png';
-                const linkLabel = v.video_url && v.video_url.includes('youtube') ? '<i class="fab fa-youtube" style="color:#f00;"></i> YouTube' : '<i class="fas fa-video" style="color:var(--gold);"></i> MP4 Video';
-                
+                const thumb = v.thumbnail ? (v.thumbnail.startsWith('http') ? v.thumbnail : '../' + v.thumbnail) : '../logo_transparent.png';
                 tbody.innerHTML += `
                     <tr>
-                        <td><img src="${thumb}" class="vlog-thumb-preview" alt="Thumb" onerror="this.src='../logo.png'"></td>
-                        <td><strong style="font-size:1.2rem;">${v.title || 'Untitled Video'}</strong></td>
-                        <td style="font-size:1.05rem;color:#555;">${linkLabel}<br><span style="font-size:0.85rem;word-break:break-all;">${v.video_url}</span></td>
+                        <td><img src="${thumb}" class="vlog-thumb-preview" alt="Thumb" onerror="this.src='../logo_transparent.png'"></td>
+                        <td><strong style="font-size:1.05rem; color:var(--primary);">${v.title || 'Untitled Video'}</strong></td>
+                        <td style="font-size:0.95rem;color:#555;"><a href="${v.video_url}" target="_blank" style="color:var(--gold);text-decoration:none;"><i class="fas fa-external-link-alt"></i> Watch Video</a></td>
                         <td class="action-btns">
-                            <button title="Edit" onclick='editVlog(${v.id})' style="font-size:1.3rem;margin-right:15px;color:var(--gold);"><i class="fas fa-edit"></i> Edit</button>
-                            <button title="Delete" onclick="deleteVlog(${v.id})" style="font-size:1.3rem;color:#dc3545;"><i class="fas fa-trash"></i></button>
+                            <button title="Edit" onclick='editVlog(${v.id})' style="font-size:1.1rem;margin-right:12px;color:var(--gold);"><i class="fas fa-edit"></i> Edit</button>
+                            <button title="Delete" onclick="deleteVlog(${v.id})" style="font-size:1.1rem;color:#dc3545;"><i class="fas fa-trash"></i></button>
                         </td>
                     </tr>
                 `;
@@ -152,55 +161,47 @@
             document.getElementById('vlogModal').style.display = 'flex';
         }
 
-        async function saveVlog(btn) {
+        function saveVlog(btn) {
             const id = document.getElementById('vId').value;
-            const data = {
-                title: document.getElementById('vTitle').value,
-                thumbnail: document.getElementById('vThumb').value,
-                video_url: document.getElementById('vLink').value,
-                status: 'published'
-            };
+            const title = document.getElementById('vTitle').value.trim();
+            const thumbnail = document.getElementById('vThumb').value.trim() || 'gal14.jpg';
+            const video_url = document.getElementById('vLink').value.trim();
 
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-            btn.disabled = true;
+            if (!title || !video_url) {
+                alert('Please enter video title and link');
+                return;
+            }
 
-            const url = id ? `/api/admin/vlogs/${id}` : `/api/admin/vlogs`;
-            const method = id ? 'PUT' : 'POST';
+            if (id) {
+                const idx = allVlogs.findIndex(x => x.id == id);
+                if (idx !== -1) {
+                    allVlogs[idx] = { ...allVlogs[idx], title, thumbnail, video_url };
+                }
+            } else {
+                allVlogs.push({ id: Date.now(), title, thumbnail, video_url });
+            }
 
-            await fetch(url, {
-                method: method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
+            localStorage.setItem('admin_vlogs', JSON.stringify(allVlogs));
             
-            btn.innerHTML = '<i class="fas fa-check"></i> Saved';
+            btn.innerHTML = '<i class="fas fa-check"></i> Saved!';
             btn.style.background = '#28a745';
-            btn.style.color = '#fff';
-            
             setTimeout(() => {
-                btn.innerHTML = originalText;
+                btn.innerHTML = '<i class="fas fa-save"></i> Save Video';
                 btn.style.background = '';
-                btn.style.color = '';
-                btn.disabled = false;
                 closeModal();
-                loadVlogs();
-            }, 1000);
+                renderVlogs();
+            }, 800);
         }
 
-        async function deleteVlog(id) {
+        function deleteVlog(id) {
             if(confirm('Are you sure you want to delete this video?')) {
-                await fetch(`/api/admin/vlogs/${id}`, { method: 'DELETE' });
-                loadVlogs();
+                allVlogs = allVlogs.filter(x => x.id !== id);
+                localStorage.setItem('admin_vlogs', JSON.stringify(allVlogs));
+                renderVlogs();
             }
         }
 
-        async function logout() {
-            await fetch('/api/auth/logout', { method: 'POST' });
-            window.location.href = 'login.html';
-        }
-
-        loadVlogs();
+        renderVlogs();
     </script>
 </body>
 </html>

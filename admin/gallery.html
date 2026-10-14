@@ -1,26 +1,32 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>gallery - Sabla Singh Academy</title>
+    <title>Gallery - Sabla Singh Academy</title>
     <link rel="stylesheet" href="css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="js/auth-guard.js"></script>
     <style>
-        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .btn-add { background: var(--primary); color: #fff; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; display: flex; gap: 8px; align-items: center; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .btn-add { background: var(--primary); color: #fff; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; display: flex; gap: 8px; align-items: center; font-size: 1rem; font-weight: 700; }
         .btn-add:hover { background: #000; }
-        .srv-img-preview { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; }
+        .srv-img-preview { width: 70px; height: 70px; object-fit: cover; border-radius: 8px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content { background: #fff; padding: 35px; border-radius: 16px; width: 100%; max-width: 500px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+        .modal-header h3 { color: var(--primary); font-family: 'Playfair Display', serif; font-size: 1.8rem; }
+        .close-btn { background: none; border: none; font-size: 1.8rem; cursor: pointer; color: var(--text-muted); }
     </style>
 </head>
 <body>
     <div class="sidebar">
-        <div class="sidebar-logo"><img src="../logo.png" alt="Logo"></div>
+        <div class="sidebar-logo"><img src="../logo_transparent.png" alt="Logo"></div>
         <div class="sidebar-menu">
             <a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a>
             <a href="queries.html"><i class="fas fa-envelope"></i> Enquiries</a>
-            <a href="gallery.html" class="active"><i class="fas fa-gem"></i> gallery</a>
+            <a href="services.html"><i class="fas fa-gem"></i> Services</a>
             <a href="courses.html"><i class="fas fa-graduation-cap"></i> Courses</a>
-            <a href="gallery.html"><i class="fas fa-images"></i> Gallery</a>
+            <a href="gallery.html" class="active"><i class="fas fa-images"></i> Gallery</a>
             <a href="vlogs.html"><i class="fas fa-video"></i> Vlogs</a>
             <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
         </div>
@@ -36,71 +42,142 @@
 
         <div class="content-area">
             <div class="page-header">
-                <p style="color:var(--text-muted);">Manage the gallery displayed on the public website.</p>
-                <button class="btn-add" onclick="alert('Upload Photo modal would open here')"><i class="fas fa-plus"></i> Upload Photo</button>
+                <p style="color:var(--text-muted);">Manage real bridal and makeup transformation photos displayed on the gallery.</p>
+                <button class="btn-add" onclick="openModal()"><i class="fas fa-plus"></i> Add Photo</button>
             </div>
 
             <div class="table-card">
                 <table>
                     <thead>
                         <tr>
-                            <th>Order</th>
-                            <th>Image</th>
-                            <th>Image Title</th>
-                            <th>Features Count</th>
-                            <th>Status</th>
+                            <th>Preview</th>
+                            <th>Photo Title</th>
+                            <th>Category</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="galleryTable">
-                        <tr><td colspan="6" style="text-align:center;">Loading...</td></tr>
+                        <tr><td colspan="4" style="text-align:center;">Loading photos...</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
+    <!-- Modal -->
+    <div class="modal" id="photoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add Gallery Photo</h3>
+                <button class="close-btn" onclick="closeModal()">×</button>
+            </div>
+            <form id="photoForm">
+                <div class="form-group">
+                    <label>Photo Title / Client Look</label>
+                    <input type="text" id="pTitle" placeholder="e.g. Royal Bridal Look" required>
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="pCategory" style="width:100%; padding:12px; border-radius:8px; border:1px solid #ddd;">
+                        <option value="Bridal">Bridal</option>
+                        <option value="Airbrush">Airbrush</option>
+                        <option value="Hair">Hair</option>
+                        <option value="Academy">Academy</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Image Filename or URL</label>
+                    <input type="text" id="pImage" placeholder="gal1.jpg OR https://..." required>
+                </div>
+                <button type="button" class="btn-gold" style="font-size:1.1rem; padding: 14px; margin-top: 15px;" onclick="savePhoto(this)"><i class="fas fa-save"></i> Save Photo</button>
+            </form>
+        </div>
+    </div>
+
     <script>
-        async function loadgallery() {
-            const res = await fetch('/api/admin/gallery');
-            if (res.status === 401) window.location.href = 'login.html';
-            const gallery = await res.json();
-            
+        const defaultGallery = [
+            { id: 1, title: "Royal Red Bridal Glam", category: "Bridal", image: "gal1.jpg" },
+            { id: 2, title: "Contemporary Pastel Bride", category: "Bridal", image: "gal2.jpg" },
+            { id: 3, title: "Engagement Soft Glow", category: "Airbrush", image: "gal3.jpg" },
+            { id: 4, title: "Cocktail Modern Makeup", category: "Bridal", image: "gal6.jpg" },
+            { id: 5, title: "Reception Smokey Eyes", category: "Bridal", image: "gal7.jpg" },
+            { id: 6, title: "Intricate Bridal Updo", category: "Hair", image: "gal8.jpg" },
+            { id: 7, title: "Floral Hair Styling", category: "Hair", image: "gal9.jpg" },
+            { id: 8, title: "Academy Hands-on Workshop", category: "Academy", image: "gal10.jpg" },
+            { id: 9, title: "Student Masterclass Batch", category: "Academy", image: "gal11.jpg" },
+            { id: 10, title: "Live Transformation Demo", category: "Academy", image: "gal12.jpg" },
+            { id: 11, title: "Airbrush Flawless Base", category: "Airbrush", image: "gal13.jpg" },
+            { id: 12, title: "Signature Sabla Singh Look", category: "Bridal", image: "gal14.jpg" }
+        ];
+
+        let allGallery = JSON.parse(localStorage.getItem('admin_gallery')) || defaultGallery;
+
+        function renderGallery() {
             const tbody = document.getElementById('galleryTable');
             tbody.innerHTML = '';
             
-            gallery.forEach(s => {
-                const featCount = s.features ? s.features.split('|').length : 0;
+            allGallery.forEach(p => {
+                const imgPath = p.image.startsWith('http') ? p.image : '../' + p.image;
                 tbody.innerHTML += `
                     <tr>
-                        <td><strong>${s.display_order}</strong></td>
-                        <td><img src="../${s.image}" class="srv-img-preview" alt="img" onerror="this.src='../logo.png'"></td>
-                        <td><strong><i class="${s.icon}" style="color:var(--gold);margin-right:5px;"></i> ${s.title}</strong><br><span style="font-size:0.8rem;color:#888;">${s.subtitle}</span></td>
-                        <td>${featCount} features</td>
-                        <td><span class="badge" style="background:#d4edda;color:#155724;">${s.status}</span></td>
+                        <td><img src="${imgPath}" class="srv-img-preview" alt="img" onerror="this.src='../logo_transparent.png'"></td>
+                        <td><strong style="font-size:1.05rem; color:var(--primary);">${p.title}</strong></td>
+                        <td><span style="font-weight:600; color:var(--gold);">${p.category}</span></td>
                         <td class="action-btns">
-                            <button title="Edit" onclick="alert('Edit service ${s.id}')"><i class="fas fa-edit"></i></button>
-                            <button title="Delete" onclick="deletePhoto(${s.id})" style="color:#dc3545;"><i class="fas fa-trash"></i></button>
+                            <button title="Delete" onclick="deletePhoto(${p.id})" style="font-size:1.1rem;color:#dc3545;"><i class="fas fa-trash"></i></button>
                         </td>
                     </tr>
                 `;
             });
         }
 
-        async function deletePhoto(id) {
-            if(confirm('Are you sure you want to delete this service?')) {
-                await fetch(`/api/admin/gallery/${id}`, { method: 'DELETE' });
-                loadgallery();
+        function openModal() {
+            document.getElementById('photoForm').reset();
+            document.getElementById('photoModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('photoModal').style.display = 'none';
+        }
+
+        function savePhoto(btn) {
+            const title = document.getElementById('pTitle').value.trim();
+            const category = document.getElementById('pCategory').value;
+            const image = document.getElementById('pImage').value.trim();
+
+            if (!title || !image) {
+                alert('Please provide title and image path');
+                return;
+            }
+
+            allGallery.unshift({
+                id: Date.now(),
+                title,
+                category,
+                image
+            });
+
+            localStorage.setItem('admin_gallery', JSON.stringify(allGallery));
+            
+            btn.innerHTML = '<i class="fas fa-check"></i> Added!';
+            btn.style.background = '#28a745';
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-save"></i> Save Photo';
+                btn.style.background = '';
+                closeModal();
+                renderGallery();
+            }, 800);
+        }
+
+        function deletePhoto(id) {
+            if (confirm('Delete this photo from gallery?')) {
+                allGallery = allGallery.filter(x => x.id !== id);
+                localStorage.setItem('admin_gallery', JSON.stringify(allGallery));
+                renderGallery();
             }
         }
 
-        async function logout() {
-            await fetch('/api/auth/logout', { method: 'POST' });
-            window.location.href = 'login.html';
-        }
-
-        loadgallery();
+        renderGallery();
     </script>
 </body>
 </html>
-
